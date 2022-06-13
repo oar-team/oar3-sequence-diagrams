@@ -36,15 +36,13 @@
               "^sources"
               "^sources/.*\.pu"
             ];
-            buildInputs = [ pkgs.plantuml pkgs.tree ];
+            buildInputs = [ pkgs.plantuml ];
             buildPhase = ''
               set -x
               for file in sources/*.pu; do
                 plantuml $file -tpng
                 plantuml $file -tsvg
               done
-              ls -l
-              tree
             '';
             installPhase = ''
               mkdir -p $out
@@ -54,13 +52,15 @@
           default = diagrams;
         });
 
-      devShell = forAllSystems (system:
-        (nixpkgsFor.${system}.mkShell {
-          buildInputs = with nixpkgsFor.${system}; [
-            plantuml
-          ];
+      devShells = forAllSystems (system:
+        {
+          default = nixpkgsFor.${system}.mkShell {
+            buildInputs = with nixpkgsFor.${system}; [
+              plantuml
+            ];
+          };
         })
-      );
+      ;
 
       # Tests run by 'nix flake check' and by Hydra.
       checks = forAllSystems
